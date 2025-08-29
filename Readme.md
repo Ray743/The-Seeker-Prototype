@@ -1,7 +1,7 @@
 # The Seeker App 🟢
 ![Seeker Logo](/logo.png)
 
----
+#Live Preview: http://localhost:5173/The-Seeker-Prototype/
 
 ## Overview
 
