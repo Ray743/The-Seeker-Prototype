@@ -1,0 +1,6 @@
+_pycache_/
+.vscode/
+DB/
+junk/
+venv/
+description.txt
