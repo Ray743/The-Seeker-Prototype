@@ -58,7 +58,7 @@ The production-ready version will include:
 - **Flask backend** for API and live data integration
 - Jobs stored in a **SQL database** for dynamic querying and updates
 - Improved authentication, error handling, and deployment optimizations
-- [Placeholder: Add any other planned production features here]
+
 
 ---
 
