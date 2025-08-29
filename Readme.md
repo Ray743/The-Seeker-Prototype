@@ -1,4 +1,4 @@
-# The Seeker App 🟢 http://localhost:5173/The-Seeker-Prototype/
+# The Seeker App 🟢 (https://ray743.github.io/The-Seeker-Prototype/)
 
 ![Seeker Logo](/logo.png)
 
