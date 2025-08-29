@@ -1,0 +1,32 @@
+{
+  "name": "JobListings",
+  "baseSelector": "div.cursor-pointer.transition.rounded-md",
+  "fields": [
+    {
+      "name": "title",
+      "selector": "p.text-base.font-semibold",
+      "type": "text"
+    },
+    {
+      "name": "location",
+      "selector": "div.flex.items-center.mr-1",
+      "type": "text"
+    },
+    {
+      "name": "datePosted",
+      "selector": "div.cursor-pointer.transition.rounded-md div.flex.items-center svg.lucide-clock + span",
+      "type": "text"
+    },
+    {
+      "name": "jobLink",
+      "selector": "a.ml-auto.inline-flex[href^='/jobs/']",
+      "type": "attribute",
+      "attribute": "href"
+    },
+    {
+      "name": "description",
+      "selector": "p.mt-3.text-xs.text-gray-700",
+      "type": "text"
+    }
+  ]
+}

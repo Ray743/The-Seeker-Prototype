@@ -1,0 +1,42 @@
+{
+  "name": "JobListingExtractor",
+  "baseSelector": ".job-result-featured",
+  "fields": [
+    {
+      "name": "title",
+      "selector": ".t2 a",
+      "type": "text"
+    },
+    {
+      "name": "jobLink",
+      "selector": ".t2 a",
+      "type": "attribute",
+      "attribute": "href"
+    },
+    {
+      "name": "datePosted",
+      "selector": ".col2 p strong:nth-of-type(1)",
+      "type": "text"
+    },
+    {
+      "name": "companyName",
+      "selector": ".col2 p strong:nth-of-type(2)",
+      "type": "text"
+    },
+    {
+      "name": "category",
+      "selector": ".col2 p a.link:nth-of-type(1)",
+      "type": "text"
+    },
+    {
+      "name": "location",
+      "selector": ".col2 p a.link:nth-of-type(2)",
+      "type": "text"
+    },
+    {
+      "name": "description",
+      "selector": ".col2 p:nth-of-type(3)",
+      "type": "text"
+    }
+  ]
+}

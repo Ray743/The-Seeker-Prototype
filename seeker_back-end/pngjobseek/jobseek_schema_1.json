@@ -1,0 +1,32 @@
+{
+  "name": "JobListings",
+  "baseSelector": "tr.priorityListing.premium",
+  "fields": [
+    {
+      "name": "title",
+      "selector": "h2.tablewidth",
+      "type": "text"
+    },
+    {
+      "name": "location",
+      "selector": "td h3:contains(\", \")",
+      "type": "text"
+    },
+    {
+      "name": "datePosted",
+      "selector": "h3.h3-blue",
+      "type": "text"
+    },
+    {
+      "name": "jobLink",
+      "selector": "td.viewDetails a",
+      "type": "attribute",
+      "attribute": "href"
+    },
+    {
+      "name": "description",
+      "selector": "td.viewDetails p",
+      "type": "text"
+    }
+  ]
+}
