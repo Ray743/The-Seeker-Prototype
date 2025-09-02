@@ -5,7 +5,7 @@
 
 ## Overview
 
-Seeker is a **minimal functional prototype** of a job listing application. This version currently displays **~220 jobs** and is built for demonstration purposes. The app is **not production-ready** and is designed to showcase core functionality and the integration workflow between scrapers, backend, and frontend.  
+Seeker is a **minimal functional prototype** of a job listing application. This version is built for demonstration purposes only. The app is **not production-ready** and is designed to showcase core functionality and the integration workflow between scrapers, backend, and frontend.  
 
 Future versions will enhance features, improve performance, and implement live data integration.  
 
