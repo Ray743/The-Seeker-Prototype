@@ -1,4 +1,4 @@
-# The Seeker App 🟢 (https://ray743.github.io/The-Seeker-Prototype/)
+# The Seeker App 🟢 Preview:(https://ray743.github.io/The-Seeker-Prototype/)
 
 ![Seeker Logo](/logo.png)
 
