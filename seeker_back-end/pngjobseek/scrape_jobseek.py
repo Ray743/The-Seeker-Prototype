@@ -14,8 +14,8 @@ from crawl4ai import (
 
 async def scraper():
     """
-    Scrapes all available job listings using different schemas for different page layouts.
-    Stops when the 'next page' button is disabled.
+    Scrapes all available job listings using both schemas.
+    Chooses the schema that successfully extracts data for the current page layout.
     """
     print("\n=== Scraping PNG Jobseek ===")
 
@@ -28,6 +28,8 @@ async def scraper():
     with open(schema_2_path, "r", encoding="utf-8") as f:
         schema_2_dict = json.load(f)
 
+    schemas = [("Schema 1", schema_1_dict), ("Schema 2", schema_2_dict)]
+
     jobs = []
     base_url = "https://www.pngjobseek.com/search-results-jobs/"
     search_id = None
@@ -35,95 +37,72 @@ async def scraper():
 
     async with AsyncWebCrawler(config=BrowserConfig(headless=False)) as crawler:
         while True:
-            if page_number == 1:
-                current_url = base_url
-            else:
-                if not search_id:
-                    print("Error: searchId not found. Cannot continue pagination.")
-                    break
-                
-                query_params = {
-                    'searchId': search_id,
-                    'action': 'search',
-                    'page': page_number,
-                    'view': 'list'
-                }
-                query_string = urllib.parse.urlencode(query_params)
-                current_url = f"{base_url}?{query_string}"
+            current_url = base_url if page_number == 1 else f"{base_url}?{urllib.parse.urlencode({'searchId': search_id, 'action': 'search', 'page': page_number, 'view': 'list'})}"
 
             print(f"Scraping Page {page_number}: {current_url}")
 
-            if page_number <= 3:
-                selected_schema = schema_1_dict
-                print("Using Schema 1 for pages 1-3.")
-            else:
-                selected_schema = schema_2_dict
-                print("Using Schema 2 for pages 4 and above.")
+            extracted_data = None
+            selected_schema_name = None
 
-            current_config = CrawlerRunConfig(
-                session_id="jobseek_session",
-                extraction_strategy=JsonCssExtractionStrategy(schema=selected_schema),
-            )
+            # Try both schemas
+            for name, schema in schemas:
+                current_config = CrawlerRunConfig(
+                    session_id="jobseek_session",
+                    extraction_strategy=JsonCssExtractionStrategy(schema=schema),
+                )
 
-            results: list[CrawlResult] = await crawler.arun(
-                url=current_url,
-                config=current_config,
-            )
+                results: list[CrawlResult] = await crawler.arun(
+                    url=current_url,
+                    config=current_config,
+                )
 
-            jobs_scraped_on_page = 0
-            for res in results:
-                if res.success:
-                    # Check for the disabled next button to end the loop
-                    soup = BeautifulSoup(res.html, 'html.parser')
-                    disabled_next_button = soup.select_one('span.btn.disabled i.icon-circle-arrow-right')
-                    if disabled_next_button:
-                        print("Found disabled 'next page' button. All jobs have been scraped.")
-                        # Break out of the for loop to exit the while loop
-                        jobs_scraped_on_page = 0  
-                        break
+                for res in results:
+                    if res.success:
+                        try:
+                            data = json.loads(res.extracted_content)
+                        except json.JSONDecodeError:
+                            continue
+                        if data:  # Schema worked
+                            extracted_data = data
+                            selected_schema_name = name
+                            res_html = res.html
+                            break
+                if extracted_data:
+                    break  # Stop trying other schemas once one works
 
-                    # Capture searchId on the first page
-                    if page_number == 1 and not search_id:
-                        next_button = soup.select_one('a.btn[href*="searchId"]')
-                        if next_button and 'href' in next_button.attrs:
-                            parsed_next_url = urllib.parse.urlparse(next_button['href'])
-                            params = urllib.parse.parse_qs(parsed_next_url.query)
-                            if 'searchId' in params:
-                                search_id = params['searchId'][0]
-                                print(f"Initial searchId captured: {search_id}")
-                            else:
-                                print("No searchId found on initial page. Check website structure.")
-                                jobs_scraped_on_page = 0
-                                break
-                    
-                    try:
-                        data = json.loads(res.extracted_content)
-                    except json.JSONDecodeError:
-                        print(f"Failed to decode JSON from {current_url}. Ending scraper.")
-                        jobs_scraped_on_page = 0
-                        break
-
-                    if not data:
-                        print("No more jobs found on this page. Ending scraper.")
-                        jobs_scraped_on_page = 0
-                        break
-
-                    jobs.extend(data)
-                    jobs_scraped_on_page = len(data)
-                    print(f"Jobs scraped from this page: {jobs_scraped_on_page}")
-                else:
-                    print(f"Failed to extract structured data from {current_url}. Ending scraper.")
-                    jobs_scraped_on_page = 0
-                    break
-            
-            # Check the flag set to 0 when the loop should terminate
-            if jobs_scraped_on_page == 0:
-                print("Ending scraper loop.")
+            if not extracted_data:
+                print(f"Failed to extract data from {current_url} using both schemas. Ending scraper.")
                 break
+
+            print(f"Using {selected_schema_name} for this page.")
+            jobs.extend(extracted_data)
+            jobs_scraped_on_page = len(extracted_data)
+            print(f"Jobs scraped from this page: {jobs_scraped_on_page}")
+
+            # Parse HTML to check for disabled next button
+            soup = BeautifulSoup(res_html, 'html.parser')
+            disabled_next_button = soup.select_one('span.btn.disabled i.icon-circle-arrow-right')
+            if disabled_next_button:
+                print("Found disabled 'next page' button. All jobs have been scraped.")
+                break
+
+            # Capture searchId on the first page
+            if page_number == 1 and not search_id:
+                next_button = soup.select_one('a.btn[href*="searchId"]')
+                if next_button and 'href' in next_button.attrs:
+                    parsed_next_url = urllib.parse.urlparse(next_button['href'])
+                    params = urllib.parse.parse_qs(parsed_next_url.query)
+                    if 'searchId' in params:
+                        search_id = params['searchId'][0]
+                        print(f"Initial searchId captured: {search_id}")
+                    else:
+                        print("No searchId found on initial page. Check website structure.")
+                        break
 
             page_number += 1
             await asyncio.sleep(5)
 
+    # Deduplicate jobs by Job-ID
     unique_jobs = {}
     for job in jobs:
         try:
@@ -138,6 +117,7 @@ async def scraper():
         json.dump(jobs, f, indent=2)
 
     print(f"\n Scraped total {len(jobs)} unique jobs. Saved to {out_path}")
+
 
 if __name__ == "__main__":
     asyncio.run(scraper())

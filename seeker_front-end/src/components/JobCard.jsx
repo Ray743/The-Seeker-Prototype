@@ -17,11 +17,12 @@ export default function JobCard({
   };
 
   return (
-    <div className="job-card bg-white p-6 rounded-xl shadow border border-gray-100 hover:shadow-lg transition-all">
-      <div className="flex justify-between items-start mb-4">
-        <div>
+    <div className="job-card bg-white p-4 sm:p-6 rounded-xl shadow border border-gray-100 hover:shadow-lg transition-all flex flex-col">
+      {/* Title and Icon */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
+        <div className="flex-1 mb-3 sm:mb-0">
           <h3
-            className="font-semibold text-lg text-gray-800 mb-1 cursor-pointer hover:text-blue-500"
+            className="font-semibold text-lg sm:text-xl text-gray-800 mb-1 cursor-pointer hover:text-blue-500 break-words"
             onClick={() => {
               setSelectedJob(job.jobLink);
               setLoading(true);
@@ -29,29 +30,32 @@ export default function JobCard({
           >
             {job.title}
           </h3>
-          <p className="text-gray-600">{job.companyName}</p>
+          <p className="text-gray-600 text-sm sm:text-base">{job.companyName}</p>
         </div>
-        <div className={`w-12 h-12 ${colorClasses[color].bg} rounded-lg flex items-center justify-center`}>
-          <i className={`${getCategoryIcon(job.category)} ${colorClasses[color].text} text-xl`}></i>
+        <div className={`w-12 h-12 sm:w-14 sm:h-14 ${colorClasses[color].bg} rounded-lg flex items-center justify-center flex-shrink-0`}>
+          <i className={`${getCategoryIcon(job.category)} ${colorClasses[color].text} text-xl sm:text-2xl`}></i>
         </div>
       </div>
 
-      <div className="flex items-center text-gray-500 mb-4">
+      {/* Location */}
+      <div className="flex items-center text-gray-500 text-sm sm:text-base mb-4 flex-wrap">
         <i className="fas fa-map-marker-alt mr-2"></i>
-        <span className="text-sm">{job.location}</span>
+        <span>{job.location}</span>
       </div>
 
+      {/* Tags */}
       <div className="flex flex-wrap gap-2 mb-4">
-        <span className={`${colorClasses[color].badge} text-xs px-3 py-1 rounded-full`}>
+        <span className={`${colorClasses[color].badge} text-xs sm:text-sm px-2 sm:px-3 py-1 rounded-full`}>
           {job.category}
         </span>
-        <span className="bg-gray-100 text-gray-700 text-xs px-3 py-1 rounded-full">
+        <span className="bg-gray-100 text-gray-700 text-xs sm:text-sm px-2 sm:px-3 py-1 rounded-full">
           {job.type || "Full-time"}
         </span>
       </div>
 
-      <div className="flex justify-between items-center">
-        <span className="text-gray-500 text-sm">Posted: {job.datePosted}</span>
+      {/* Footer */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center text-gray-500 text-sm sm:text-base gap-1">
+        <span>Posted: {job.datePosted}</span>
         {job.salary && <span className="font-semibold text-gray-800">{job.salary}</span>}
       </div>
     </div>
